@@ -3,12 +3,8 @@ open System.IO
 let inputFile = fsi.CommandLineArgs[1]
 let input = File.ReadAllText(inputFile)
 
-let lists =
-    input.Split [|'\n'|]
-    |> Seq.filter(fun line -> line.Length > 0)
-    |> Seq.map(fun line -> 
-        line.Split(' ', System.StringSplitOptions.RemoveEmptyEntries) 
-        |> Seq.map int32)
+let removeAt idx (s: seq<'T>) =
+    Seq.append (Seq.take idx s) (Seq.skip (idx + 1) s)
 
 let isValidRow row =
     row
@@ -23,6 +19,12 @@ let isValidRow row =
         (true, None, true)
     |> fun (a, _, c) -> a && c
 
+let lists =
+    input.Split [|'\n'|]
+    |> Seq.filter(fun line -> line.Length > 0)
+    |> Seq.map(fun line -> 
+        line.Split(' ', System.StringSplitOptions.RemoveEmptyEntries) 
+        |> Seq.map int32)
 
 let day1 = 
     lists
@@ -32,13 +34,10 @@ let day1 =
 let day2 = 
     lists
     |> Seq.filter (fun row ->
-        // Check if the row is already valid
         if isValidRow row then true
         else
-            // Otherwise, attempt dampening
             row
-            |> Seq.mapi (fun idx _ ->
-                row |> Seq.toList |> List.removeAt idx |> Seq.ofList)
+            |> Seq.mapi (fun idx _ -> removeAt idx row)
             |> Seq.exists isValidRow)
 
 printfn "Day1: %i" (day1 |> Seq.length)
