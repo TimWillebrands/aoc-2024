@@ -44,8 +44,7 @@ let day2 =
                 else
                     (isBlocked, Seq.append acc [exp])
             | Do -> (false, acc)
-            | Dont -> (true, acc)
-            ) 
+            | Dont -> (true, acc)) 
             (false, [])
 
 let (_, d2) = day2
