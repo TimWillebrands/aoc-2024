@@ -21,7 +21,7 @@ let found =
             match m.Value with
             | Prefix "mul" rest ->
                 yield Regex.Matches(rest, "\d+") 
-                |> Seq.cast<System.Text.RegularExpressions.Match>
+                |> Seq.cast<Match>
                 |> Seq.map (fun x -> x.Value |> int)
                 |> Seq.toList
                 |> (fun s -> Mul(s[0],s[1]))
