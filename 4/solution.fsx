@@ -1,15 +1,16 @@
 open System.IO
 
-let len = 140
 let fileName = if fsi.CommandLineArgs.Length > 1 then fsi.CommandLineArgs[1] else "4/example"
+let len = if fsi.CommandLineArgs.Length > 2 then int fsi.CommandLineArgs[2] else 140
 let input =
     fileName
     |> File.ReadAllText
     |> _.ReplaceLineEndings("")
     |> (fun i -> Array2D.init len len (fun y x -> i[x + y * len]))
 
+let diagonals = [| (1,1);(1,-1);(-1,-1);(-1,1); |]
 let directions =
-    [| (0,1);(0,-1);(1,0);(-1,0);(1,1);(1,-1);(-1,-1);(-1,1); |]
+    Array.concat [ [| (0,1);(0,-1);(1,0);(-1,0); |] ; diagonals ]
     
 let tryGet y x =
     if x >= 0 && x < Array2D.length1 input && y >= 0 && y < Array2D.length2 input then
@@ -18,7 +19,7 @@ let tryGet y x =
         None
 
 //            start  dir      acc
-let rec check (y, x) (dx, dy) (path:string) = 
+let rec xmas (y, x) (dx, dy) (path:string) = 
     let dirX = dx * path.Length
     let dirY = dy * path.Length
     match tryGet (y+dirY) (x+dirX) with
@@ -28,22 +29,41 @@ let rec check (y, x) (dx, dy) (path:string) =
         if p = "XMAS" then
             true 
         else if "XMAS".StartsWith(p) then
-            check (y, x) (dx, dy) p
+            xmas (y, x) (dx, dy) p
         else if p.Length > 4 then
             false
         else
             false
 
-let checkPosition y x =
-    directions 
-    |> Seq.map (fun dir -> check (y, x) dir "")
+let day1 =
+    let check y x = 
+        directions 
+        |> Seq.map (fun dir -> xmas (y, x) dir "")
+        |> Seq.filter (fun x -> x)
+        |> Seq.length
+    Array2D.init len len check
+    |> Seq.cast<int>
+    |> Seq.sum
+
+let mas y x =
+    let mid = tryGet y x
+    let ring = 
+        diagonals
+        |> Seq.map (fun (dx, dy) -> tryGet (y+dy) (x+dx))
+        |> Seq.choose id
+        |> Seq.map string
+        |> String.concat ""
+
+    match ring with 
+    | "SSMM" | "SMMS" | "MMSS" | "MSSM" when mid = Some 'A' -> true
+    | _ -> false
+
+let day2 =
+    Array2D.init len len mas
+    |> Seq.cast<bool>
     |> Seq.filter (fun x -> x)
     |> Seq.length
 
-let day1 =
-    Array2D.init len len checkPosition
-    |> Seq.cast<int>
-    |> Seq.sum
-    
-printfn "Input: %A" input
+// printfn "Input: %A" input
 printfn "Day1: %A" day1
+printfn "Day2: %A" day2
