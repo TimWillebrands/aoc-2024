@@ -45,20 +45,18 @@ let day1 =
     |> Seq.cast<int>
     |> Seq.sum
 
-let mas y x =
-    let mid = tryGet y x
-    let ring = 
-        diagonals
-        |> Seq.map (fun (dx, dy) -> tryGet (y+dy) (x+dx))
-        |> Seq.choose id
-        |> Seq.map string
-        |> String.concat ""
-
-    match ring with 
-    | "SSMM" | "SMMS" | "MMSS" | "MSSM" when mid = Some 'A' -> true
-    | _ -> false
-
 let day2 =
+    let mas y x =
+        let mid = tryGet y x
+        let ring = 
+            diagonals
+            |> Seq.map (fun (dx, dy) -> tryGet (y+dy) (x+dx))
+            |> Seq.choose id
+            |> Seq.map string
+            |> String.concat ""
+        match ring with 
+        | "SSMM" | "SMMS" | "MMSS" | "MSSM" when mid = Some 'A' -> true
+        | _ -> false
     Array2D.init len len mas
     |> Seq.cast<bool>
     |> Seq.filter (fun x -> x)
