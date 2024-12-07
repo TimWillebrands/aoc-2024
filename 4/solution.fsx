@@ -39,7 +39,7 @@ let day1 =
     let check y x = 
         directions 
         |> Seq.map (fun dir -> xmas (y, x) dir "")
-        |> Seq.filter (fun x -> x)
+        |> Seq.filter id
         |> Seq.length
     Array2D.init len len check
     |> Seq.cast<int>
@@ -59,7 +59,7 @@ let day2 =
         | _ -> false
     Array2D.init len len mas
     |> Seq.cast<bool>
-    |> Seq.filter (fun x -> x)
+    |> Seq.filter id
     |> Seq.length
 
 // printfn "Input: %A" input
