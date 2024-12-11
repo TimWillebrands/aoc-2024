@@ -20,21 +20,17 @@ let toBlocks (input: int array) =
                     Spc = match Array.tryItem (i+1) input with | Some s -> s | None -> 0
                } }
 
-let move block len amount =
-    printfn $"Moving: {amount} of id-{block.Id}. Len: {len} "
+let move (block: Block) len amount =
     let rec mv cnt checksumAdd =
         if cnt < amount then
             let i = len + cnt
-            let add = (checksumAdd + (i * block.Id))
-            printfn $"\t{i}: '{block.Id}' -> '{add}'"
+            let add = (checksumAdd + (int64 i * int64 block.Id))
             mv (cnt + 1) add
         else checksumAdd
     mv 0 0
 
-let compact (allBlocks: Block list) =
+let defrag (allBlocks: Block list) =
     let rec reduce blocks (acc: Result) =
-        // printfn $"Current blocks: %A{blocks}"
-        // printfn $"Current state: %A{acc}"
         match blocks with
         | [] -> acc 
         | _ ->
@@ -66,9 +62,6 @@ let compact (allBlocks: Block list) =
             
     reduce allBlocks { Chksm = 0; Len = 0; Spc = 0}
 
-let part1 =
-    // printfn $"Input array: %A{input}"
-    let blocks = input |> toBlocks |> Seq.toList
-    printfn $"Parsed blocks: %A{blocks |> List.rev |> List.take 10}"
-    compact blocks
-printfn $"Day1: %A{part1}" 
+let part1 = input |> toBlocks |> Seq.toList |> defrag
+
+printfn $"Part-1: %A{part1}" 
