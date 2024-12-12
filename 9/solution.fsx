@@ -29,7 +29,7 @@ let move (block: Block) len amount =
         else checksumAdd
     mv 0 0
 
-let defrag (allBlocks: Block list) =
+let frag (allBlocks: Block list) =
     let rec reduce blocks (acc: Result) =
         match blocks with
         | [] -> acc 
@@ -55,13 +55,13 @@ let defrag (allBlocks: Block list) =
                 // We've moved the whole block so drop it like its hot
                 if tailBlock.Len = amount then
                     reduce restOfBlocks newAcc
-                // There is some juice left in this box so lets move that too
+                // There is some juice left in this box so let's move that too
                 else
                     let updatedTailBlock = { tailBlock with Len = tailBlock.Len - amount }
                     reduce (restOfBlocks @ [ updatedTailBlock ]) newAcc            
             
     reduce allBlocks { Chksm = 0; Len = 0; Spc = 0}
 
-let part1 = input |> toBlocks |> Seq.toList |> defrag
+let part1 = input |> toBlocks |> Seq.toList |> frag
 
 printfn $"Part-1: %A{part1}" 
